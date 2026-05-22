@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 @Getter
 @Builder
 public class Plano {
+    private Long id;
     private String descricao;
     private BigDecimal preco;
 }

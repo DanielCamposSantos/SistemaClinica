@@ -7,9 +7,9 @@ import java.util.List;
 public class PacienteService {
     private static PacienteService instance;
 
-    private final PacienteHardCodedRepository repository;
+    private final PacienteRepository repository;
     private PacienteService() {
-        repository = PacienteHardCodedRepository.getInstance();
+        repository = PacienteRepository.getInstance();
     }
     public static PacienteService getInstance() {
         if (instance == null) {

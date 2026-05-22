@@ -13,7 +13,7 @@ public class Paciente {
     private String cpf;
     private String endereco;
     private LocalDate dataNascimento;
-    private Plano plano;
+    private Long idPlano;
 
 
 }
