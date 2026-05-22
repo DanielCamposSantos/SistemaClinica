@@ -1,8 +1,6 @@
-package io.github.danielcampossantos.service;
+package io.github.danielcampossantos.paciente;
 
 import io.github.danielcampossantos.domain.Paciente;
-import io.github.danielcampossantos.repository.PacienteHardCodedRepository;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
@@ -22,5 +20,9 @@ public class PacienteService {
 
     public List<Paciente> findAll() {
         return repository.findAll();
+    }
+
+    public Paciente save(Paciente paciente) {
+        return repository.save(paciente);
     }
 }

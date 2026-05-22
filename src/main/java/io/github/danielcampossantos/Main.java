@@ -1,7 +1,7 @@
 package io.github.danielcampossantos;
 
 import com.sun.net.httpserver.HttpServer;
-import io.github.danielcampossantos.controller.PacienteController;
+import io.github.danielcampossantos.paciente.PacienteController;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

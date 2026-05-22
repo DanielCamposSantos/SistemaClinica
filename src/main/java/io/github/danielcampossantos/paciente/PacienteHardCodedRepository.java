@@ -1,5 +1,6 @@
-package io.github.danielcampossantos.repository;
+package io.github.danielcampossantos.paciente;
 
+import io.github.danielcampossantos.dbSimulator.PacienteData;
 import io.github.danielcampossantos.domain.Paciente;
 
 import java.util.List;
@@ -28,6 +29,11 @@ public class PacienteHardCodedRepository {
 
     public List<Paciente> findAll() {
         return pacienteData.getPacientes();
+    }
+
+    public Paciente save(Paciente paciente) {
+        pacienteData.getPacientes().add(paciente);
+        return paciente;
     }
 
 }
