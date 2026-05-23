@@ -5,7 +5,6 @@ import io.github.danielcampossantos.conn.Repository;
 import io.github.danielcampossantos.domain.Paciente;
 import io.github.danielcampossantos.exception.BadRequestException;
 import io.github.danielcampossantos.paciente.dto.Prontuario;
-import io.github.danielcampossantos.utils.HttpUtils;
 
 import javax.sql.rowset.JdbcRowSet;
 import java.sql.SQLException;
