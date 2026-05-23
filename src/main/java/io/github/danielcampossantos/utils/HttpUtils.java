@@ -2,7 +2,10 @@ package io.github.danielcampossantos.utils;
 
 import com.sun.net.httpserver.HttpExchange;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
@@ -22,9 +25,9 @@ public class HttpUtils {
         }
     }
 
-    public static void enviarErro(HttpExchange exchange, String mensagem,int statusCode) throws IOException {
+    public static void enviarErro(HttpExchange exchange, String mensagem, int statusCode) throws IOException {
         String erro = "{\"erro\":\"%s\"}".formatted(mensagem);
-        enviarResposta(exchange,erro,statusCode,"application/json");
+        enviarResposta(exchange, erro, statusCode, "application/json");
     }
 
     public static String lerBody(HttpExchange exchange) throws IOException {

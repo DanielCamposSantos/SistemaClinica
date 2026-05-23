@@ -4,10 +4,10 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import io.github.danielcampossantos.domain.Paciente;
+import io.github.danielcampossantos.exception.BadRequestException;
 import io.github.danielcampossantos.utils.HttpUtils;
 
 import java.io.IOException;
-import java.util.Optional;
 
 public class PacienteController implements HttpHandler {
 
@@ -43,17 +43,33 @@ public class PacienteController implements HttpHandler {
 
 
     private void handleGet(HttpExchange exchange) throws IOException {
+        String path = exchange.getRequestURI().getPath();
+
+        if (path.matches(".*/prontuario/\\d+")) {
+            try {
+                String[] parts = path.split("/");
+                var id = Long.parseLong(parts[parts.length - 1]);
+                var prontuario = service.findProntuarioByPacienteId(id).orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
+                String json = gson.toJson(prontuario);
+                HttpUtils.enviarResposta(exchange,json,200,"application/json");
+            } catch (BadRequestException e) {
+                HttpUtils.enviarErro(exchange,e.getMessage(),e.getHttpStatus());
+            }
+        }
+
+
         var listaDePacientes = service.findAll();
         String json = gson.toJson(listaDePacientes);
 
         HttpUtils.enviarResposta(exchange, json, 200, "application/json");
+
     }
 
     private void handlePost(HttpExchange exchange) throws IOException {
         String body = HttpUtils.lerBody(exchange);
 
-        if (body.isEmpty()){
-            HttpUtils.enviarErro(exchange,"O body está vazio",400);
+        if (body.isEmpty()) {
+            HttpUtils.enviarErro(exchange, "O body está vazio", 400);
         }
 
         Paciente pacienteToAdd = gson.fromJson(body, Paciente.class);
