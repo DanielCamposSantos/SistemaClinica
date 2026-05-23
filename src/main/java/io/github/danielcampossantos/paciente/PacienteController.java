@@ -45,10 +45,10 @@ public class PacienteController implements HttpHandler {
     private void handleGet(HttpExchange exchange) throws IOException {
         String path = exchange.getRequestURI().getPath();
 
-        if (path.matches(".*/prontuario/\\d+")) {
+        if (path.matches(".*/\\d+/prontuario")) {
             try {
                 String[] parts = path.split("/");
-                var id = Long.parseLong(parts[parts.length - 1]);
+                var id = Long.parseLong(parts[2]);
                 var prontuario = service.findProntuarioByPacienteId(id).orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
                 String json = gson.toJson(prontuario);
                 HttpUtils.enviarResposta(exchange,json,200,"application/json");
