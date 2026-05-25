@@ -1,6 +1,7 @@
 package io.github.danielcampossantos;
 
 import com.sun.net.httpserver.HttpServer;
+import io.github.danielcampossantos.agendamento.AgendamentoController;
 import io.github.danielcampossantos.atendente.AtendenteController;
 import io.github.danielcampossantos.medico.MedicoController;
 import io.github.danielcampossantos.paciente.PacienteController;
@@ -16,10 +17,10 @@ public class Main {
         server.createContext("/pacientes", PacienteController.getInstance());
         server.createContext("/medicos", MedicoController.getInstance());
         server.createContext("/atendentes", AtendenteController.getInstance());
+        server.createContext("/agendamentos", AgendamentoController.getInstance());
         server.setExecutor(null);
         server.start();
 
-        System.out.println("Sevidor iniciado na porta 8080");
-
+        System.out.println("Servidor iniciado na porta 8080");
     }
 }
