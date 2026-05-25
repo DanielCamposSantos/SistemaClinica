@@ -1,17 +1,14 @@
 package io.github.danielcampossantos.paciente;
 
 import io.github.danielcampossantos.conn.ConnectionFactory;
-import io.github.danielcampossantos.conn.Repository;
-import io.github.danielcampossantos.domain.Paciente;
-import io.github.danielcampossantos.exception.BadRequestException;
-import io.github.danielcampossantos.paciente.dto.Prontuario;
-import io.github.danielcampossantos.utils.HttpUtils;
+import io.github.danielcampossantos.paciente.dto.PacienteGetResponse;
+import io.github.danielcampossantos.paciente.dto.ProntuarioGetResponse;
 
 import javax.sql.rowset.JdbcRowSet;
 import java.sql.SQLException;
 import java.util.*;
 
-public class PacienteRepository implements Repository<Paciente> {
+public class PacienteRepository {
     private static PacienteRepository instance;
 
     public static PacienteRepository getInstance() {
@@ -25,66 +22,30 @@ public class PacienteRepository implements Repository<Paciente> {
     }
 
 
-    @Override
-    public Optional<Paciente> findById(Long id) {
-        return Optional.empty();
-    }
-
-    @Override
-    public List<Paciente> findAll() {
-        String sql = "SELECT * FROM paciente";
-        List<Paciente> pacientes = new ArrayList<>();
-        try (JdbcRowSet rowSet = ConnectionFactory.getJdbcRowSet()
-        ) {
-            rowSet.setCommand(sql);
-            rowSet.execute();
-            while (rowSet.next()) {
-                var paciente = Paciente.builder()
-                        .id(rowSet.getLong("id"))
-                        .nome(rowSet.getString("nome"))
-                        .cpf(rowSet.getString("cpf"))
-                        .endereco(rowSet.getString("endereco"))
-                        .dataNascimento(rowSet.getDate("data_nascimento").toLocalDate())
-                        .idPlano(rowSet.getLong("id_plano"))
-                        .build();
-
-                pacientes.add(paciente);
-            }
-
-            return pacientes;
-
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return Collections.emptyList();
-    }
-
-    @Override
-    public Paciente save(Paciente entity) {
-        return null;
-    }
-
-
-    public Optional<Prontuario> getProntuarioByPacienteId(Long id) {
+    public Optional<PacienteGetResponse> findById(Long id) {
         String sql = """
                 SELECT
-                    p.nome as paciente_nome,
-                    m.nome as medico_nome,
-                    ex.descricao as exame_descricao,
-                    re.analise_resultados,
-                    d.diagnostico_descricao,
-                    t.tratamento_descricao
-                FROM consulta c
-                INNER JOIN paciente p ON p.id = c.id_paciente
-                INNER JOIN medico m ON m.id = c.id_medico
-                INNER JOIN exames_solicitados es ON es.id_consulta = c.id
-                INNER JOIN exame ex ON ex.id = es.id_exame
-                INNER JOIN resultados_exames re ON re.id_exames_solicitados = es.id
-                INNER JOIN diagnostico d ON d.id_consulta = c.id
-                INNER JOIN tratamento t ON t.id_diagnostico = d.id
+                    p.id,
+                    p.nome,
+                    p.cpf,
+                    p.data_nascimento,
+                    s.sobrenome,
+                    pl.descricao AS plano_descricao,
+                    pl.valor AS plano_valor,
+                    r.descricao AS rua,
+                    n.numero,
+                    b.descricao AS bairro,
+                    c.descricao AS cidade,
+                    e.complemento
+                FROM paciente p
+                JOIN sobrenome s ON p.id_sobrenome = s.id
+                LEFT JOIN plano pl ON p.id_plano = pl.id
+                LEFT JOIN endereco e ON p.id_endereco = e.id
+                LEFT JOIN rua r ON e.id_rua = r.id
+                LEFT JOIN numero n ON e.id_numero = n.id
+                LEFT JOIN bairro b ON e.id_bairro = b.id
+                LEFT JOIN cidade c ON e.id_cidade = c.id
                 WHERE p.id = ?
-                ORDER BY p.nome ASC;
                 """;
 
         try (JdbcRowSet rowSet = ConnectionFactory.getJdbcRowSet()) {
@@ -92,63 +53,222 @@ public class PacienteRepository implements Repository<Paciente> {
             rowSet.setLong(1, id);
             rowSet.execute();
 
-            Map<String, List<String>> examesComResultados = new LinkedHashMap<>();
-            Set<String> diagnosticosSet = new LinkedHashSet<>();
-            Set<String> tratamentosSet = new LinkedHashSet<>();
+            if (rowSet.next()) {
+                var paciente = PacienteGetResponse.builder()
+                        .id(rowSet.getLong("id"))
+                        .nome(rowSet.getString("nome"))
+                        .cpf(rowSet.getString("cpf"))
+                        .dataNascimento(rowSet.getDate("data_nascimento").toLocalDate())
+                        .sobrenome(rowSet.getString("sobrenome"))
+                        .planoDescricao(rowSet.getString("plano_descricao"))
+                        .planoValor(rowSet.getBigDecimal("plano_valor"))
+                        .rua(rowSet.getString("rua"))
+                        .numero(rowSet.getString("numero"))
+                        .bairro(rowSet.getString("bairro"))
+                        .cidade(rowSet.getString("cidade"))
+                        .complemento(rowSet.getString("complemento"))
+                        .build();
 
-            String nomePaciente = null;
-            String nomeMedico = null;
-
-            if (!rowSet.next()) {
-                throw new BadRequestException("Nenhum valor foi encontrado");
+                return Optional.of(paciente);
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
+    }
+
+
+    public List<PacienteGetResponse> findAll() {
+        String sql = """
+                SELECT
+                    p.id,
+                    p.nome,
+                    p.cpf,
+                    p.data_nascimento,
+                    s.sobrenome,
+                    pl.descricao AS plano_descricao,
+                    pl.valor AS plano_valor,
+                    r.descricao AS rua,
+                    n.numero,
+                    b.descricao AS bairro,
+                    c.descricao AS cidade,
+                    e.complemento
+                FROM paciente p
+                JOIN sobrenome s ON p.id_sobrenome = s.id
+                LEFT JOIN plano pl ON p.id_plano = pl.id
+                LEFT JOIN endereco e ON p.id_endereco = e.id
+                LEFT JOIN rua r ON e.id_rua = r.id
+                LEFT JOIN numero n ON e.id_numero = n.id
+                LEFT JOIN bairro b ON e.id_bairro = b.id
+                LEFT JOIN cidade c ON e.id_cidade = c.id
+                """;
+
+        try (JdbcRowSet rowSet = ConnectionFactory.getJdbcRowSet()) {
+            rowSet.setCommand(sql);
+            rowSet.execute();
+            List<PacienteGetResponse> pacientes = new ArrayList<>();
 
             while (rowSet.next()) {
-                if (nomePaciente == null) {
-                    nomePaciente = rowSet.getString("paciente_nome");
-                }
-                if (nomeMedico == null) {
-                    nomeMedico = rowSet.getString("medico_nome");
-                }
+                var paciente = PacienteGetResponse.builder()
+                        .id(rowSet.getLong("id"))
+                        .nome(rowSet.getString("nome"))
+                        .cpf(rowSet.getString("cpf"))
+                        .dataNascimento(rowSet.getDate("data_nascimento").toLocalDate())
+                        .sobrenome(rowSet.getString("sobrenome"))
+                        .planoDescricao(rowSet.getString("plano_descricao"))
+                        .planoValor(rowSet.getBigDecimal("plano_valor"))
+                        .rua(rowSet.getString("rua"))
+                        .numero(rowSet.getString("numero"))
+                        .bairro(rowSet.getString("bairro"))
+                        .cidade(rowSet.getString("cidade"))
+                        .complemento(rowSet.getString("complemento"))
+                        .build();
+                pacientes.add(paciente);
+            }
+            return pacientes;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return Collections.emptyList();
+    }
 
-                String exame = rowSet.getString("exame_descricao");
+    public List<ProntuarioGetResponse> findAllProntuario() {
+        String sql = """
+                SELECT DISTINCT
+                    p.id AS paciente_id,
+                    p.nome AS paciente_nome,
+                    m.nome AS medico_nome,
+                    ex.descricao AS exame,
+                    rex.analise_resultados,
+                    d.diagnostico_descricao,
+                    t.tratamento_descricao
+                FROM paciente p
+                LEFT JOIN consulta cons ON p.id = cons.id_paciente
+                LEFT JOIN medico m ON cons.id_medico = m.id
+                LEFT JOIN exames_solicitados es ON cons.id = es.id_consulta
+                LEFT JOIN exame ex ON es.id_exame = ex.id
+                LEFT JOIN resultados_exames rex ON es.id_consulta = rex.id_consulta 
+                    AND es.id_exame = rex.id_exame
+                LEFT JOIN diagnostico d ON cons.id = d.id_consulta
+                LEFT JOIN tratamento t ON d.id = t.id_diagnostico
+                ORDER BY p.id
+                """;
+
+        Map<Long, ProntuarioGetResponse> prontuarioMap = new LinkedHashMap<>();
+
+        try (JdbcRowSet rowSet = ConnectionFactory.getJdbcRowSet()) {
+            rowSet.setCommand(sql);
+            rowSet.execute();
+
+            while (rowSet.next()) {
+                Long pacienteId = rowSet.getLong("paciente_id");
+
+                ProntuarioGetResponse prontuario = prontuarioMap.computeIfAbsent(pacienteId, id -> {
+                    try {
+                        return ProntuarioGetResponse.builder()
+                                .id(id)
+                                .nomePaciente(rowSet.getString("paciente_nome"))
+                                .nomeMedico(rowSet.getString("medico_nome"))
+                                .examesComResultados(new HashMap<>())
+                                .diagnosticos(new ArrayList<>())
+                                .tratamentos(new ArrayList<>())
+                                .build();
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+
+                String exame = rowSet.getString("exame");
                 String resultado = rowSet.getString("analise_resultados");
-
-                if (exame != null && resultado != null) {
-                    examesComResultados.computeIfAbsent(exame, k -> new ArrayList<>())
-                            .add(resultado);
+                if (exame != null) {
+                    prontuario.examesComResultados()
+                            .computeIfAbsent(exame, k -> new ArrayList<>())
+                            .add(resultado != null ? resultado : "Sem resultado");
                 }
 
                 String diagnostico = rowSet.getString("diagnostico_descricao");
-                if (diagnostico != null && !diagnostico.trim().isEmpty()) {
-                    diagnosticosSet.add(diagnostico);
+                if (diagnostico != null && !prontuario.diagnosticos().contains(diagnostico)) {
+                    prontuario.diagnosticos().add(diagnostico);
                 }
 
                 String tratamento = rowSet.getString("tratamento_descricao");
-                if (tratamento != null && !tratamento.trim().isEmpty()) {
-                    tratamentosSet.add(tratamento);
+                if (tratamento != null && !prontuario.tratamentos().contains(tratamento)) {
+                    prontuario.tratamentos().add(tratamento);
                 }
             }
 
-            examesComResultados.forEach((exame, resultados) -> {
-                List<String> semDuplicatas = new ArrayList<>(new LinkedHashSet<>(resultados));
-                examesComResultados.put(exame, semDuplicatas);
-            });
-
-            Prontuario prontuario = Prontuario.builder()
-                    .nomePaciente(nomePaciente)
-                    .nomeMedico(nomeMedico)
-                    .examesComResultados(examesComResultados)
-                    .diagnosticos(new ArrayList<>(diagnosticosSet))
-                    .tratamentos(new ArrayList<>(tratamentosSet))
-                    .build();
-
-            return Optional.of(prontuario);
-
         } catch (SQLException e) {
-            return Optional.empty();
+            e.printStackTrace();
         }
+
+        return new ArrayList<>(prontuarioMap.values());
     }
 
+    public Optional<ProntuarioGetResponse> findByIdProntuario(Long id) {
+        String sql = """
+                SELECT DISTINCT
+                    p.id AS paciente_id,
+                    p.nome AS paciente_nome,
+                    m.nome AS medico_nome,
+                    ex.descricao AS exame,
+                    rex.analise_resultados,
+                    d.diagnostico_descricao,
+                    t.tratamento_descricao
+                FROM paciente p
+                LEFT JOIN consulta cons ON p.id = cons.id_paciente
+                LEFT JOIN medico m ON cons.id_medico = m.id
+                LEFT JOIN exames_solicitados es ON cons.id = es.id_consulta
+                LEFT JOIN exame ex ON es.id_exame = ex.id
+                LEFT JOIN resultados_exames rex ON es.id_consulta = rex.id_consulta 
+                    AND es.id_exame = rex.id_exame
+                LEFT JOIN diagnostico d ON cons.id = d.id_consulta
+                LEFT JOIN tratamento t ON d.id = t.id_diagnostico
+                WHERE p.id = ?
+                """;
+
+        ProntuarioGetResponse prontuario = null;
+
+        try (JdbcRowSet rowSet = ConnectionFactory.getJdbcRowSet()) {
+            rowSet.setCommand(sql);
+            rowSet.setLong(1, id);
+            rowSet.execute();
+
+            while (rowSet.next()) {
+                if (prontuario == null) {
+                    prontuario = ProntuarioGetResponse.builder()
+                            .id(rowSet.getLong("paciente_id"))
+                            .nomePaciente(rowSet.getString("paciente_nome"))
+                            .nomeMedico(rowSet.getString("medico_nome"))
+                            .examesComResultados(new HashMap<>())
+                            .diagnosticos(new ArrayList<>())
+                            .tratamentos(new ArrayList<>())
+                            .build();
+                }
+
+                String exame = rowSet.getString("exame");
+                String resultado = rowSet.getString("analise_resultados");
+                if (exame != null) {
+                    prontuario.examesComResultados()
+                            .computeIfAbsent(exame, k -> new ArrayList<>())
+                            .add(resultado != null ? resultado : "Sem resultado");
+                }
+
+                String diagnostico = rowSet.getString("diagnostico_descricao");
+                if (diagnostico != null && !prontuario.diagnosticos().contains(diagnostico)) {
+                    prontuario.diagnosticos().add(diagnostico);
+                }
+
+                String tratamento = rowSet.getString("tratamento_descricao");
+                if (tratamento != null && !prontuario.tratamentos().contains(tratamento)) {
+                    prontuario.tratamentos().add(tratamento);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return Optional.ofNullable(prontuario);
+    }
 
 }

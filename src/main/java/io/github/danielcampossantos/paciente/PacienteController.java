@@ -3,7 +3,6 @@ package io.github.danielcampossantos.paciente;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import io.github.danielcampossantos.domain.Paciente;
 import io.github.danielcampossantos.exception.BadRequestException;
 import io.github.danielcampossantos.utils.HttpUtils;
 
@@ -28,6 +27,8 @@ public class PacienteController implements HttpHandler {
         return instance;
     }
 
+    private static final String CONTENT_TYPE = "application/json";
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String metodo = exchange.getRequestMethod();
@@ -36,45 +37,62 @@ public class PacienteController implements HttpHandler {
             handleGet(exchange);
         }
 
-        if (metodo.equals("POST")) {
-            handlePost(exchange);
-        }
     }
 
 
     private void handleGet(HttpExchange exchange) throws IOException {
         String path = exchange.getRequestURI().getPath();
 
-        if (path.matches(".*/prontuario/\\d+")) {
-            try {
+        try {
+            //GET /pacientes/{id} - Buscar paciente por ID
+            if (path.matches("/pacientes/\\d+")) {
                 String[] parts = path.split("/");
                 var id = Long.parseLong(parts[parts.length - 1]);
-                var prontuario = service.findProntuarioByPacienteId(id).orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
-                String json = gson.toJson(prontuario);
-                HttpUtils.enviarResposta(exchange,json,200,"application/json");
-            } catch (BadRequestException e) {
-                HttpUtils.enviarErro(exchange,e.getMessage(),e.getHttpStatus());
+                var paciente = service.findById(id);
+                String json = gson.toJson(paciente);
+                HttpUtils.enviarResposta(exchange, json, 200, CONTENT_TYPE);
+                return;
             }
+
+            //GET /pacientes - Listar todos os pacientes
+            if (path.equals("/pacientes")) {
+                var listaPacientes = service.findAll();
+                String json = gson.toJson(listaPacientes);
+                HttpUtils.enviarResposta(exchange, json, 200, CONTENT_TYPE);
+                return;
+            }
+
+
+            //GET /pacientes/prontuarios/{id} - Buscar prontuário específico (MAIS ESPECÍFICO PRIMEIRO)
+            if (path.matches("/pacientes/prontuarios/\\d+")) {
+                String[] parts = path.split("/");
+                var id = Long.parseLong(parts[parts.length - 1]);
+                var prontuario = service.findProntuarioByPacienteId(id);
+                String json = gson.toJson(prontuario);
+                HttpUtils.enviarResposta(exchange, json, 200, CONTENT_TYPE);
+                return;
+            }
+
+            //GET /pacientes/prontuarios - Listar todos os prontuários
+            if (path.equals("/pacientes/prontuarios")) {
+                var listaProntuarios = service.findAllProntuarios();
+                String json = gson.toJson(listaProntuarios);
+                HttpUtils.enviarResposta(exchange, json, 200, CONTENT_TYPE);
+                return;
+            }
+
+
+            // Se nenhuma rota corresponder
+            HttpUtils.enviarErro(exchange, "Rota não encontrada", 404);
+
+        } catch (BadRequestException e) {
+            HttpUtils.enviarErro(exchange, e.getMessage(), e.getHttpStatus());
+        } catch (NumberFormatException e) {
+            HttpUtils.enviarErro(exchange, "ID inválido", 400);
+        } catch (Exception e) {
+            HttpUtils.enviarErro(exchange, "Erro interno do servidor: " + e.getMessage(), 500);
         }
-
-
-        var listaDePacientes = service.findAll();
-        String json = gson.toJson(listaDePacientes);
-
-        HttpUtils.enviarResposta(exchange, json, 200, "application/json");
-
     }
 
-    private void handlePost(HttpExchange exchange) throws IOException {
-        String body = HttpUtils.lerBody(exchange);
 
-        if (body.isEmpty()) {
-            HttpUtils.enviarErro(exchange, "O body está vazio", 400);
-        }
-
-        Paciente pacienteToAdd = gson.fromJson(body, Paciente.class);
-        service.save(pacienteToAdd);
-
-        HttpUtils.enviarResposta(exchange, "", 201, "application/json");
-    }
 }
