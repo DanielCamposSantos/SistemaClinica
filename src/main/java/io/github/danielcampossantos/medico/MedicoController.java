@@ -31,11 +31,7 @@ public class MedicoController implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        String metodo = exchange.getRequestMethod();
-
-        if (metodo.equals("GET")) {
-            handleGet(exchange);
-        }
+        HttpUtils.setMethods(exchange,this::handleGet);
 
     }
 

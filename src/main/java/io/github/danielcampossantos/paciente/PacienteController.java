@@ -37,14 +37,9 @@ public class PacienteController implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        String metodo = exchange.getRequestMethod();
-
-        if (metodo.equals("GET")) {
-            handleGet(exchange);
-        }
+        HttpUtils.setMethods(exchange,this::handleGet);
 
     }
-
 
     private void handleGet(HttpExchange exchange) throws IOException {
         String path = exchange.getRequestURI().getPath();

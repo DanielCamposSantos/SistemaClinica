@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class HttpUtils {
@@ -28,6 +30,26 @@ public class HttpUtils {
     public static void enviarErro(HttpExchange exchange, String mensagem, int statusCode) throws IOException {
         String erro = "{\"erro\":\"%s\"}".formatted(mensagem);
         enviarResposta(exchange, erro, statusCode, "application/json");
+    }
+
+    public static void setMethods(HttpExchange exchange, GetHandler handleGet) throws IOException {
+        String metodo = exchange.getRequestMethod();
+
+        if (metodo.equals("OPTIONS")) {
+            handleOptions(exchange);
+            return;
+        }
+
+        if (metodo.equals("GET")) {
+            handleGet.handleGet(exchange);
+        }
+    }
+
+    private static void handleOptions(HttpExchange exchange) throws IOException {
+        exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+        exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, OPTIONS");
+        exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        exchange.sendResponseHeaders(204, -1);
     }
 
 

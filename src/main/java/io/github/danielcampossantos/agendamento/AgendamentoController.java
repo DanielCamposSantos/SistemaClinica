@@ -34,11 +34,8 @@ public class AgendamentoController implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        String metodo = exchange.getRequestMethod();
+        HttpUtils.setMethods(exchange,this::handleGet);
 
-        if (metodo.equals("GET")) {
-            handleGet(exchange);
-        }
     }
 
     private void handleGet(HttpExchange exchange) throws IOException {
