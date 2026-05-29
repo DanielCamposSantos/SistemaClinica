@@ -30,12 +30,5 @@ public class HttpUtils {
         enviarResposta(exchange, erro, statusCode, "application/json");
     }
 
-    public static String lerBody(HttpExchange exchange) throws IOException {
-        try (BufferedReader br = new BufferedReader(
-                new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8))) {
-            return br.lines().collect(Collectors.joining("\n"));
-        }
-    }
-
 
 }

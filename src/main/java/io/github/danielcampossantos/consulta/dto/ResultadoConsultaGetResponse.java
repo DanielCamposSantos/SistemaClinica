@@ -1,6 +1,5 @@
 package io.github.danielcampossantos.consulta.dto;
 
-import io.github.danielcampossantos.consulta.dto.ExameResultado;
 import lombok.Builder;
 
 import java.time.LocalDate;
