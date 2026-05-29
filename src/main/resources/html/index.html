@@ -1,15 +1,164 @@
 <!doctype html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>teste</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Sistema Clínica</title>
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  />
 </head>
+
 <body>
-    <h1>Lista de pacientes</h1>
-    <ul id="lista"></ul>
+<div class="sidebar">
+  <div>
+    <h2>Clínica</h2>
+
+    <ul>
+      <li onclick="mostrarTela('dashboard')">
+        <i class="fa-solid fa-house"></i>
+        Dashboard
+      </li>
+
+      <li onclick="mostrarTela('pacientes')">
+        <i class="fa-solid fa-user"></i>
+        Pacientes
+      </li>
+
+      <li onclick="mostrarTela('medicos')">
+        <i class="fa-solid fa-user-doctor"></i>
+        Médicos
+      </li>
+
+      <li onclick="mostrarTela('agendamentos')">
+        <i class="fa-solid fa-calendar"></i>
+        Agendamentos
+      </li>
+
+      <li onclick="mostrarTela('atendentes')">
+        <i class="fa-solid fa-headset"></i>
+        Atendentes
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <h1>Sistema Clínica</h1>
+  </div>
+
+  <div class="cards">
+    <div class="card-info">
+      <h3 id="qtdPacientes">0</h3>
+      <p>Pacientes</p>
+    </div>
+
+    <div class="card-info">
+      <h3 id="qtdMedicos">0</h3>
+      <p>Médicos</p>
+    </div>
+
+    <div class="card-info">
+      <h3 id="qtdAgendamentos">0</h3>
+      <p>Agendamentos</p>
+    </div>
+  </div>
+
+  <div class="conteudo">
+    <div id="dashboard" class="tela ativa">
+      <h2>Dashboard</h2>
+      <p>Bem-vindo ao sistema da clínica.</p>
+    </div>
+
+    <div id="pacientes" class="tela">
+      <div class="titulo-tela">
+        <h2>Pacientes</h2>
+        <button onclick="carregarPacientes()">Atualizar</button>
+      </div>
+
+      <table>
+        <thead>
+        <tr>
+          <th>Nome</th>
+          <th>CPF</th>
+          <th>Plano</th>
+          <th>Valor Plano</th>
+          <th>Data Nascimento</th>
+          <th>Endereço</th>
+        </tr>
+        </thead>
+        <tbody id="listaPacientes"></tbody>
+      </table>
+    </div>
+
+    <div id="medicos" class="tela">
+      <div class="titulo-tela">
+        <h2>Médicos</h2>
+        <button onclick="carregarMedicos()">Atualizar</button>
+      </div>
+
+      <table>
+        <thead>
+        <tr>
+          <th>Nome</th>
+          <th>CRM</th>
+          <th>Especialidade</th>
+          <th>Salário</th>
+        </tr>
+        </thead>
+        <tbody id="listaMedicos"></tbody>
+      </table>
+    </div>
+
+    <div id="agendamentos" class="tela">
+      <div class="titulo-tela">
+        <h2>Agendamentos</h2>
+        <button onclick="carregarAgendamentos()">Atualizar</button>
+      </div>
+
+      <table>
+        <thead>
+        <tr>
+          <th>Paciente</th>
+          <th>Médico</th>
+          <th>Especialidade</th>
+          <th>Atendente</th>
+          <th>Valor</th>
+          <th>Data Agendamento</th>
+          <th>Data Consulta</th>
+          <th>Horário</th>
+        </tr>
+        </thead>
+        <tbody id="listaAgendamentos"></tbody>
+      </table>
+    </div>
+
+    <div id="atendentes" class="tela">
+      <div class="titulo-tela">
+        <h2>Atendentes</h2>
+        <button onclick="carregarAtendentes()">Atualizar</button>
+      </div>
+
+      <table>
+        <thead>
+        <tr>
+          <th>Nome Completo</th>
+          <th>Email</th>
+          <th>Salário</th>
+          <th>Data de Nascimento</th>
+        </tr>
+        </thead>
+        <tbody id="listaAtendentes"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="js/script.js"></script>
 </body>
-<script src="script.js"></script>
 </html>
