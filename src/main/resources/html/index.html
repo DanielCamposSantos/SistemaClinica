@@ -106,7 +106,6 @@
             <div id="detalhePacienteConteudo"></div>
         </div>
 
-        <!-- Resto do HTML permanece igual -->
         <div id="prontuario" class="tela">
             <div class="titulo-tela">
                 <h2>Prontuário</h2>
@@ -190,6 +189,7 @@
                         <option value="11">Novembro</option>
                         <option value="12">Dezembro</option>
                     </select>
+                    <select id="filtroAno" onchange="filtrarAgendamentosPorMes()"></select>
                     <button onclick="carregarAgendamentos()">Todos</button>
                     <button onclick="carregarAgendamentos()">Atualizar</button>
                 </div>
