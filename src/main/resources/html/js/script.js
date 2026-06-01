@@ -1,3 +1,5 @@
+const BASE_URL = 'https://verbose-garbanzo-7vw7j7jj7xj5frrg6-8080.app.github.dev';
+
 function mostrarTela(id) {
     const telas = document.querySelectorAll('.tela');
     telas.forEach(tela => {
@@ -58,7 +60,7 @@ function preencherSelectAno() {
 
 async function carregarPacientes() {
     try {
-        const resposta = await fetch('http://localhost:8080/pacientes');
+        const resposta = await fetch(`${BASE_URL}/pacientes`);
         const pacientes = await resposta.json();
         const tabela = document.getElementById('listaPacientes');
         tabela.innerHTML = '';
@@ -99,7 +101,7 @@ async function carregarPacientes() {
 
 async function buscarPacientePorId(id) {
     try {
-        const resposta = await fetch(`http://localhost:8080/pacientes/${id}`);
+        const resposta = await fetch(`${BASE_URL}/pacientes/${id}`);
         const paciente = await resposta.json();
 
         const container = document.getElementById('detalhePacienteConteudo');
@@ -133,7 +135,7 @@ async function buscarPacientePorId(id) {
 
 async function buscarProntuario(pacienteId) {
     try {
-        const resposta = await fetch(`http://localhost:8080/pacientes/prontuarios/${pacienteId}`);
+        const resposta = await fetch(`${BASE_URL}/pacientes/prontuarios/${pacienteId}`);
         const prontuario = await resposta.json();
 
         const container = document.getElementById('prontuarioConteudo');
@@ -179,7 +181,7 @@ async function buscarProntuario(pacienteId) {
 
 async function buscarResultados(pacienteId) {
     try {
-        const resposta = await fetch(`http://localhost:8080/pacientes/${pacienteId}/resultados`);
+        const resposta = await fetch(`${BASE_URL}/pacientes/${pacienteId}/resultados`);
         const resultados = await resposta.json();
 
         const tabela = document.getElementById('listaResultados');
@@ -224,7 +226,7 @@ async function buscarResultados(pacienteId) {
 
 async function buscarReceitas(pacienteId) {
     try {
-        const resposta = await fetch(`http://localhost:8080/pacientes/${pacienteId}/receitas`);
+        const resposta = await fetch(`${BASE_URL}/pacientes/${pacienteId}/receitas`);
 
         if (!resposta.ok) {
             const erro = await resposta.json();
@@ -272,7 +274,7 @@ async function buscarReceitas(pacienteId) {
 
 async function carregarMedicos() {
     try {
-        const resposta = await fetch('http://localhost:8080/medicos');
+        const resposta = await fetch(`${BASE_URL}/medicos`);
         const medicos = await resposta.json();
         const tabela = document.getElementById('listaMedicos');
         tabela.innerHTML = '';
@@ -300,7 +302,7 @@ async function carregarMedicos() {
 
 async function buscarMedicoPorId(id) {
     try {
-        const resposta = await fetch(`http://localhost:8080/medicos/${id}`);
+        const resposta = await fetch(`${BASE_URL}/medicos/${id}`);
         const medico = await resposta.json();
 
         const container = document.getElementById('detalheMedicoConteudo');
@@ -326,7 +328,7 @@ async function carregarAgendamentos() {
     try {
         preencherSelectAno();
 
-        const resposta = await fetch('http://localhost:8080/agendamentos');
+        const resposta = await fetch(`${BASE_URL}/agendamentos`);
         const agendamentos = await resposta.json();
         const tabela = document.getElementById('listaAgendamentos');
         tabela.innerHTML = '';
@@ -378,7 +380,7 @@ async function filtrarAgendamentosPorMes() {
         const mes = document.getElementById('filtroMes').value;
         const ano = document.getElementById('filtroAno').value;
 
-        const resposta = await fetch(`http://localhost:8080/agendamentos?mes=${mes}&ano=${ano}`);
+        const resposta = await fetch(`${BASE_URL}/agendamentos?mes=${mes}&ano=${ano}`);
         const agendamentos = await resposta.json();
 
         const tabela = document.getElementById('listaAgendamentos');
@@ -433,7 +435,7 @@ async function filtrarAgendamentosPorMes() {
 
 async function filtrarAgendamentosPorPaciente(agendamentoId) {
     try {
-        const resposta = await fetch(`http://localhost:8080/agendamentos?paciente=${agendamentoId}`);
+        const resposta = await fetch(`${BASE_URL}/agendamentos?paciente=${agendamentoId}`);
         const agendamentos = await resposta.json();
 
         const tabela = document.getElementById('listaAgendamentosPaciente');
@@ -483,7 +485,7 @@ async function filtrarAgendamentosPorPaciente(agendamentoId) {
 
 async function carregarAtendentes() {
     try {
-        const resposta = await fetch('http://localhost:8080/atendentes');
+        const resposta = await fetch(`${BASE_URL}/atendentes`);
         const atendentes = await resposta.json();
         const tabela = document.getElementById('listaAtendentes');
         tabela.innerHTML = '';
@@ -516,7 +518,7 @@ async function carregarAtendentes() {
 
 async function buscarAtendentePorId(id) {
     try {
-        const resposta = await fetch(`http://localhost:8080/atendentes/${id}`);
+        const resposta = await fetch(`${BASE_URL}/atendentes/${id}`);
         const atendente = await resposta.json();
 
         const container = document.getElementById('detalheAtendenteConteudo');
