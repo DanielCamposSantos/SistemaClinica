@@ -2,14 +2,9 @@ package io.github.danielcampossantos.utils;
 
 import com.sun.net.httpserver.HttpExchange;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class HttpUtils {
     private HttpUtils() {
@@ -51,6 +46,5 @@ public class HttpUtils {
         exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type, Authorization");
         exchange.sendResponseHeaders(204, -1);
     }
-
 
 }
