@@ -18,6 +18,8 @@ public record PacienteGetResponse(
         String numero,
         String bairro,
         String cidade,
-        String complemento
+        String complemento,
+        String ddd,
+        String telefone
 ) {
 }

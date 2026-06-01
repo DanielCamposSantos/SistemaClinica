@@ -19,6 +19,7 @@ function formatarHorario(hour, minute) {
 }
 
 function formatarSalario(valor) {
+    if (!valor) return 'R$ 0,00';
     return valor.toLocaleString('pt-BR', {
         style: 'currency',
         currency: 'BRL'
@@ -31,6 +32,13 @@ function formatarEndereco(paciente) {
         endereco += ` (${paciente.complemento})`;
     }
     return endereco;
+}
+
+function formatarTelefone(paciente) {
+    if (!paciente.ddd || !paciente.telefone) {
+        return 'Não informado';
+    }
+    return `(${paciente.ddd}) ${paciente.telefone}`;
 }
 
 function preencherSelectAno() {
@@ -62,14 +70,16 @@ async function carregarPacientes() {
                 paciente.dataNascimento.month,
                 paciente.dataNascimento.year
             );
-            const valorPlano = formatarSalario(paciente.planoValor);
+            const valorPlano = paciente.planoValor ? formatarSalario(paciente.planoValor) : 'R$ 0,00';
             const endereco = formatarEndereco(paciente);
+            const telefone = formatarTelefone(paciente);
 
             tabela.innerHTML += `
                 <tr>
                     <td>${paciente.nome} ${paciente.sobrenome}</td>
                     <td>${paciente.cpf}</td>
-                    <td>${paciente.planoDescricao}</td>
+                    <td>${telefone}</td>
+                    <td>${paciente.planoDescricao || 'Sem plano'}</td>
                     <td>${valorPlano}</td>
                     <td>${dataNasc}</td>
                     <td>${endereco}</td>
@@ -98,15 +108,17 @@ async function buscarPacientePorId(id) {
             paciente.dataNascimento.month,
             paciente.dataNascimento.year
         );
-        const valorPlano = formatarSalario(paciente.planoValor);
+        const valorPlano = paciente.planoValor ? formatarSalario(paciente.planoValor) : 'R$ 0,00';
         const endereco = formatarEndereco(paciente);
+        const telefone = formatarTelefone(paciente);
 
         container.innerHTML = `
             <div class="detalhe-card">
                 <p><strong>Nome:</strong> ${paciente.nome} ${paciente.sobrenome}</p>
                 <p><strong>CPF:</strong> ${paciente.cpf}</p>
+                <p><strong>Telefone:</strong> ${telefone}</p>
                 <p><strong>Data de Nascimento:</strong> ${dataNasc}</p>
-                <p><strong>Plano:</strong> ${paciente.planoDescricao}</p>
+                <p><strong>Plano:</strong> ${paciente.planoDescricao || 'Sem plano'}</p>
                 <p><strong>Valor do Plano:</strong> ${valorPlano}</p>
                 <p><strong>Endereço:</strong> ${endereco}</p>
             </div>

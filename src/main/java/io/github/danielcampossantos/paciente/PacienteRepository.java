@@ -36,7 +36,9 @@ public class PacienteRepository {
                     n.numero,
                     b.descricao AS bairro,
                     c.descricao AS cidade,
-                    e.complemento
+                    e.complemento,
+                    ddd.codigo AS ddd,
+                    dig.numeros AS telefone
                 FROM paciente p
                 JOIN sobrenome s ON p.id_sobrenome = s.id
                 LEFT JOIN plano pl ON p.id_plano = pl.id
@@ -45,6 +47,9 @@ public class PacienteRepository {
                 LEFT JOIN numero n ON e.id_numero = n.id
                 LEFT JOIN bairro b ON e.id_bairro = b.id
                 LEFT JOIN cidade c ON e.id_cidade = c.id
+                LEFT JOIN telefone tel ON p.id_telefone = tel.id
+                LEFT JOIN ddd ON tel.id_ddd = ddd.id
+                LEFT JOIN digitos dig ON tel.id_digitos = dig.id
                 WHERE p.id = ?
                 """;
 
@@ -67,6 +72,8 @@ public class PacienteRepository {
                         .bairro(rowSet.getString("bairro"))
                         .cidade(rowSet.getString("cidade"))
                         .complemento(rowSet.getString("complemento"))
+                        .ddd(rowSet.getString("ddd"))
+                        .telefone(rowSet.getString("telefone"))
                         .build();
 
                 return Optional.of(paciente);
@@ -92,7 +99,9 @@ public class PacienteRepository {
                     n.numero,
                     b.descricao AS bairro,
                     c.descricao AS cidade,
-                    e.complemento
+                    e.complemento,
+                    ddd.codigo AS ddd,
+                    dig.numeros AS telefone
                 FROM paciente p
                 JOIN sobrenome s ON p.id_sobrenome = s.id
                 LEFT JOIN plano pl ON p.id_plano = pl.id
@@ -101,6 +110,9 @@ public class PacienteRepository {
                 LEFT JOIN numero n ON e.id_numero = n.id
                 LEFT JOIN bairro b ON e.id_bairro = b.id
                 LEFT JOIN cidade c ON e.id_cidade = c.id
+                LEFT JOIN telefone tel ON p.id_telefone = tel.id
+                LEFT JOIN ddd ON tel.id_ddd = ddd.id
+                LEFT JOIN digitos dig ON tel.id_digitos = dig.id
                 """;
 
         try (JdbcRowSet rowSet = ConnectionFactory.getJdbcRowSet()) {
@@ -122,6 +134,8 @@ public class PacienteRepository {
                         .bairro(rowSet.getString("bairro"))
                         .cidade(rowSet.getString("cidade"))
                         .complemento(rowSet.getString("complemento"))
+                        .ddd(rowSet.getString("ddd"))
+                        .telefone(rowSet.getString("telefone"))
                         .build();
                 pacientes.add(paciente);
             }
@@ -131,6 +145,7 @@ public class PacienteRepository {
         }
         return Collections.emptyList();
     }
+
 
     public List<ProntuarioGetResponse> findAllProntuario() {
         String sql = """
